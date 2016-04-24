@@ -1,9 +1,9 @@
 #include <utility>
 #include <functional>
+#include <iostream>
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
-#include <boost/log/trivial.hpp>
 #include <json/value.h>
 #include <json/reader.h>
 #include <json/writer.h>
@@ -18,6 +18,8 @@
 using std::move;
 using std::array;
 using std::bind;
+using std::cout;
+using std::endl;
 using std::weak_ptr;
 using std::make_shared;
 using std::mutex;
@@ -166,8 +168,7 @@ void CommandChannel::handle_connect(const Json::Value& command) {
     uint32_t id = command["id"].asUInt();
     address target_address = address::from_string(command["addr"].asString());
     uint16_t target_port = command["port"].asUInt();
-    BOOST_LOG_TRIVIAL(debug) << "Creating tunnel to " << target_address.to_string()
-                             << ":" << target_port;
+    cout << "Creating tunnel to " << target_address.to_string() << ":" << target_port << endl;
 
     weak_ptr<CommandChannel> weak_self(shared_from_this());
     // Construct tunnel and store it
