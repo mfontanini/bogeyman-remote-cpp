@@ -7,8 +7,11 @@
 #include <string>
 #include <map>
 #include <stdexcept>
+#include <atomic>
 #include <memory>
 #include <mutex>
+#include <condition_variable>
+#include <queue>
 #include <boost/asio/ip/tcp.hpp>
 #include "tunnel.h"
 
@@ -27,6 +30,7 @@ public:
     CommandChannel(boost::asio::ip::tcp::socket server_socket);
 
     void run();
+    void stop();
     void notify_status(uint32_t tunnel_id, int status);
     void remove_tunnel(uint32_t tunnel_id);
     void forward_data(uint32_t tunnel_id, Tunnel::DataType data);
@@ -38,6 +42,7 @@ private:
     using BufferType = std::array<char, MAX_PAYLOAD_SIZE>;
     using TunnelMap = std::map<uint32_t, std::shared_ptr<Tunnel>>;
 
+    void enqueue_command(const Json::Value& command);
     void read_command_size();
     void read_command_payload(size_t command_size);
     void handle_command_size(const boost::system::error_code& error, size_t bytes_transferred);
@@ -51,6 +56,10 @@ private:
     BufferType buffer_;
     TunnelMap tunnels_;
     std::mutex tunnels_mutex_;
+    std::queue<std::string> outbound_command_queue_;
+    std::mutex outbound_commands_mutex_;
+    std::condition_variable outbound_commands_cond_;
+    std::atomic<bool> running_;
 };
 
 #endif // BOGEYMAN_COMMAND_CHANNEL_H
