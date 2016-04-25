@@ -1,2 +1,2 @@
-# bogeyman-tunnel-cpp
-C++ tunnel client for [samelat/bogeyman](https://github.com/samelat/bogeyman)
+# bogeyman-remote-cpp
+C++ remote client for [samelat/bogeyman](https://github.com/samelat/bogeyman)
